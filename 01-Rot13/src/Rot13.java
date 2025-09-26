@@ -3,16 +3,25 @@ public class Rot13{
     public static char[] minuscules = "abcdefghijklmnopqrstuvwxyzàáèéíïòóúüñç".toCharArray();
     public static char[] majuscules = "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÍÏÒÓÚÜÑÇ".toCharArray();
 
+    public static void main(String[] args) {
+        String cadenaXifrada = "Hola, què tal?";
+        String cadenaDesxifrada = "Óvug, abm ägu?";
+
+        String resultatCadenaXifrada = xifraRot13(cadenaXifrada);
+        String resultatCadenaDesxifrada = desxifraRot13(cadenaDesxifrada);
+
+        System.out.println("xifrat: " + cadenaXifrada + " => " + resultatCadenaXifrada);
+        System.out.println("desxifrat: " + cadenaDesxifrada + " => " + resultatCadenaDesxifrada);
+    }
+
     public static String xifraRot13(String cadena) {
-        String resultat = "";
+        String xifraRot13 = "";
 
         for (int i = 0; i < cadena.length();i++) {
-            char c = cadena.charAt(i);
-            for (int j = 0; j<minuscules.length; j++) {
-                if (c == minuscules[j]) {
-                    int novaPos = (j + 13) % minuscules.length;
-                    resultat = resultat + minuscules[novaPos];
-                    break;
+            char lletra = cadena.charAt(i);
+            if (Character.isLowerCase(lletra) {
+                for (int index = 0; index < cadena.length(); index++) {
+                    
                 }
             }
             boolean trobat = false;
