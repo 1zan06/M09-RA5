@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -44,12 +43,13 @@ public class Polialfabetic {
         int numLletres = 0;
 
         for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
             boolean trobat = false;
             int index = -1;
 
-            for (int i = 0; i < alfabet.length; i++) {
-                if (c == alfabet[i] || Character.toUpperCase(c) == alfabet[i]) {
-                    index = i;
+            for (int j = 0; j < alfabet.length; j++) {
+                if (c == alfabet[j] || Character.toUpperCase(c) == alfabet[i]) {
+                    index = j;
                     trobat = true;
                     break;
                 }
@@ -79,10 +79,50 @@ public class Polialfabetic {
     }   
     
     public static String desxifraPoliAlfa(String text, String claveSecret) {
-        
+        int seed = calcularSeed(claveSecret);
+        String resultat = "";
+        int numLletres = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i); 
+            boolean trobat = false;
+            int index = -1;
+
+            int semillaActual = seed + numLletres;
+
+            char[] permutat = permutaAlfabet(semillaActual);
+
+            for (int j = 0; j < permutat.length; j++) {
+                if (c == permutat[j] || Character.toUpperCase(c) == permutat[j]) {
+                    index = j; 
+                    trobat = true;
+                    break;
+                }
+            }
+
+            if (trobat) {
+                char letraDescifrada = alfabet[index];
+
+                if (Character.isLowerCase(c)) {
+                    resultat = resultat + Character.toLowerCase(letraDescifrada);
+                } else {
+                    resultat = resultat + letraDescifrada;
+                }
+
+                numLletres++;
+            }
+
+            else {
+    
+                resultat = resultat + c;
+            }
+        } 
+        return resultat;
     }
+        
 
     public static void main(String[] args) {
+        String clauSecreta = "CLAVE"; 
         String msgs[]={"Test 01 àrbitre, coixí, Perímetre",
                 "Test 02 Taüll, DÍA, año",
                 "Test 03 Peça, Òrrius, Bòvila"};
@@ -90,16 +130,19 @@ public class Polialfabetic {
 
         System.out.println("Xifratge:\n--------");
         for (int i = 0; i < msgs.length;i++) {
-            initRandom(clauSecreta);
-            msgsXifrats[i] = xifraPoliAlfa(msgs[i]);
-            System.out.printf("%-34s -> %s%n,", msgs[i], msgsXifrats[i]);
+
+            msgsXifrats[i] = xifraPoliAlfa(msgs[i], clauSecreta);
+            
+            // Se corrige el formato de impresión: %n, -> %n
+            System.out.printf("%-34s -> %s%n", msgs[i], msgsXifrats[i]);
         }
-        System.out.println("Desxifratge:\n--------");
+        
+        System.out.println("\nDesxifratge:\n--------");
         for (int i = 0; i < msgs.length;i++) {
-            initRandom(clauSecreta);
-            String msg =desxifraPoliAlfa(msgsXifrats[i]);
-            System.out.printf("%-34s -> s%n%", msgsXifrats[i]);
-        }     
+            String msg = desxifraPoliAlfa(msgsXifrats[i], clauSecreta);
+            
+            System.out.printf("%-34s -> %s%n", msgsXifrats[i], msg);
+        }    
     }   
 }
 
