@@ -1,6 +1,5 @@
-import java.crypto.*;
-import java.security.*;
-
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,8 +25,9 @@ public class AES {
         iv = new byte[MIDA_IV];
         random.nextBytes(iv);
 
-        //3-generar IvParameterSpec
+        
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        
         
         //4-inicializar i cifrar
         Cipher cipher = Cipher.getInstance(FORMAT_AES);
@@ -42,8 +42,65 @@ public class AES {
         System.arraycopy(iv, 0, iv_msgXifrat, 0, MIDA_IV);
         System.arraycopy(msgXifrat, 0, iv_msgXifrat, MIDA_IV, msgXifrat.length);
 
-        //6- retornar
         return iv_msgXifrat;
+    }
+
+    public static String desxifraAES(byte[] bIVMsgXifrat, String clau) throws Exception {
+        //extraer IV, els primers 16 bytes
+        byte[] ivExtret = new byte[MIDA_IV];
+        System.arraycopy(bIVMsgXifrat, 0, ivExtret, 0, MIDA_IV);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(ivExtret);
+
+        
+        int encryptedSize = bIVMsgXifrat.length - MIDA_IV;
+        byte[] bMsgXifrat = new byte[encryptedSize];
+        System.arraycopy(bIVMsgXifrat, MIDA_IV, bMsgXifrat, 0, encryptedSize);
+
+
+        //generar hash de la clau
+        MessageDigest md = MessageDigest.getInstance(ALGORISME_HASH);
+        md.update(clau.getBytes("UTF-8"));
+        byte[] keyBytes = md.digest();
+
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, ALGORISME_XIFRAT);
+
+
+        Cipher cipher = Cipher.getInstance(FORMAT_AES);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+
+        byte[] original = cipher.doFinal(bMsgXifrat);
+
+        return new String(original, "UTF-8");
+    }
+
+    public static void main(String[] args) {
+        String[] msgs = {
+            "Lorem ipsum dicet", 
+            "Hola Andrés cómo está tu cuñado",
+            "Agora Illa Otto"
+        };
+
+        String CLAU_PARA_MAIN = AES.CLAU;
+
+        for (int i = 0; i < msgs.length; i++) {
+            String msg = msgs[i];
+            byte[] bXifrats = null;
+            String desxifrat = "";
+
+            try {
+                bXifrats = xifraAES(msg, CLAU);
+                desxifrat = desxifraAES(bXifrats, CLAU);
+            } catch (Exception e) {
+                System.err.println("Error de Xifrat: " + e.getLocalizedMessage());
+                continue; 
+            }
+
+            System.out.println("----------------------------------------");
+            System.out.println("Msg: " + msg);
+            System.out.println("Enc: " + new String(bXifrats)); 
+            System.out.println("DEC: " + desxifrat);
+        }
+        System.out.println("----------------------------------------");
     }
 }
     
